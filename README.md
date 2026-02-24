@@ -59,12 +59,12 @@ pytest
 
 ```python
 from bubble import BubbleModel, DEFAULT_CONFIG
-from bubble.messages import uniform_message
+from bubble.messages import opposite_uniform_message
 
 model = BubbleModel(DEFAULT_CONFIG)
 wpn = model.words_per_node
 
-graph = model.run(10, uniform_message(wpn, 0), uniform_message(wpn, 1))
+graph = model.run(10, opposite_uniform_message(wpn, 0), oppposite_uniform_message(wpn, 1))
 model.plot_edge_counts()
 ```
 
