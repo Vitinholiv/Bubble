@@ -7,7 +7,7 @@ def cross_group_connectivity(
     G: nx.Graph,
     words_per_node: tuple[int, int],
 ) -> float:
-    """Fraction of realised cross-group edges relative to the maximum possible.
+    """Fraction of realized cross-group edges relative to the maximum possible.
 
     This serves as a proxy for "bubble burst": higher values indicate
     more interaction across group boundaries.
@@ -34,6 +34,6 @@ def cross_group_connectivity(
     if total_possible == 0:
         return 0.0
 
-    cross_edges = sum( 1 for u,v in G.edges() if G.nodes[u]["label"] != G.nodes[v]["label"])
+    cross_edges = sum(1 for u, v in G.edges() if G.nodes[u]["label"] != G.nodes[v]["label"])
 
-    return cross_edges / total_possible
+    return float(cross_edges) / total_possible
