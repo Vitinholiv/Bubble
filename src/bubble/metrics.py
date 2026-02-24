@@ -25,14 +25,15 @@ def cross_group_connectivity(
     float
         Ratio in [0, 1].
     """
-    total_possible = words_per_node[0] * words_per_node[1]
+    counts = {0: 0, 1: 0}
+    for _, attrs in G.nodes(data=True):
+        label = attrs.get("label")
+        counts[label] += 1
+
+    total_possible = counts[0]*counts[1]
     if total_possible == 0:
         return 0.0
 
-    cross_edges = 0
-    for n1 in range(len(G.nodes)):
-        for n2 in range(n1 + 1, len(G.nodes)):
-            if G.nodes[n1]["label"] != G.nodes[n2]["label"] and G.has_edge(n1, n2):
-                cross_edges += 1
+    cross_edges = sum( 1 for u,v in G.edges() if G.nodes[u]["label"] != G.nodes[v]["label"])
 
     return cross_edges / total_possible
