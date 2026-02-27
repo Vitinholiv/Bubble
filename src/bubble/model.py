@@ -115,6 +115,7 @@ class BubbleModel:
         if aff >= self.affinity_level and not self.G.has_edge(node1, node2):
             self.G.add_edge(node1, node2)
             target = self.initial_edge_count if self.stage == 0 else self.edge_count[self.stage]
+            # Maps (label1,label2) to column index of edge_count: (0,0)->0, (0,1)->1, (1,0)->2, (1,1)->3
             target[self.labels[node1] + 2 * self.labels[node2]] += 1
 
         elif aff < self.affinity_level and self.G.has_edge(node1, node2):
@@ -186,6 +187,7 @@ class BubbleModel:
         nx.Graph
             The graph after all iterations.
         """
+        # Initialize edge count tracking for all stages as a 2D array of shape (n+1 (time), 4 (edge type)) to store counts for each edge type at each stage
         self.edge_count = np.zeros((n + 1, 4), dtype=int)
         self.edge_count[0] = self.initial_edge_count
         for i in range(n):
