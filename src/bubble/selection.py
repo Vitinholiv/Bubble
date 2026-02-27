@@ -1,6 +1,7 @@
 """Influencer selection strategies."""
 
 import networkx as nx
+import random
 
 
 def select_by_max_degree(G: nx.Graph, num_influencers: int) -> list[int]:
@@ -44,7 +45,13 @@ def select_by_max_degree(G: nx.Graph, num_influencers: int) -> list[int]:
                 top_label1.sort()
 
     # return the node ids of the selected influencers, excluding any placeholders
-    result = [node for node,_ in top_label0 if node != -1] + [
+    result_list = [node for node,_ in top_label0 if node != -1] + [
         node for node,_ in top_label1 if node != -1
     ]
-    return result
+    return result_list
+
+
+def select_randomly(G: nx.Graph, num_influencers: int = 2)-> list[int]:
+    nodes = list(G.nodes)
+    k =  min(num_influencers, len(nodes))
+    return random.sample(nodes, k = k)
