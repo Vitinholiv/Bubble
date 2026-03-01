@@ -1,6 +1,7 @@
 """Core BubbleModel simulation class."""
 
 from __future__ import annotations
+from typing import Any, Callable
 
 import networkx as nx
 import numpy as np
@@ -33,7 +34,7 @@ class BubbleModel:
     #  Construction
     # ------------------------------------------------------------------ #
 
-    def __init__(self, hp: dict[str, any]) -> None:
+    def __init__(self, hp: dict[str, Any]) -> None:
         self.stage: int = 0
         self.num_nodes: int = hp["num_nodes"]
         self.words_per_node: tuple[int, int] = tuple(hp["words_per_node"])  # type: ignore[arg-type]
@@ -91,8 +92,8 @@ class BubbleModel:
         )
 
         # --- Strategy callables ---------------------------------------
-        self.affinity: callable = hp["affinity"]
-        self.influencer_selection: callable = hp["influencer_selection"]
+        self.affinity: Callable = hp["affinity"]
+        self.influencer_selection: Callable = hp["influencer_selection"]
         self.num_influencers: int = hp["num_influencers"]
 
         # --- Initial edges --------------------------------------------

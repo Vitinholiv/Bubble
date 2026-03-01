@@ -42,11 +42,26 @@ Bubble/
     └── test_model.py
 ```
 
-## Quick Start
+## Quick Start (Linux)
 
 ```bash
 # Create & activate a virtual environment
 python -m venv .venv && source .venv/bin/activate
+
+# Install in editable mode with dev extras
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+```
+
+## Quick Start (Windows)
+```bash
+# Create a virtual environment
+python -m venv .venv
+
+# Activate the virtual environment
+.\.venv\Scripts\Activate.ps1
 
 # Install in editable mode with dev extras
 pip install -e ".[dev]"

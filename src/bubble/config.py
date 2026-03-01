@@ -1,6 +1,7 @@
 """Default configuration and model factory."""
 
 import copy
+from typing import Any
 
 import numpy as np
 
@@ -8,7 +9,7 @@ from bubble.affinity import cosine_similarity
 from bubble.metrics import cross_group_connectivity
 from bubble.selection import select_by_max_degree
 
-DEFAULT_CONFIG: dict[str, any] = {
+DEFAULT_CONFIG: dict[str, Any] = {
     "num_nodes": 20,
     "words_per_node": (4, 4),
     "affinity_level": 0.1,
@@ -24,7 +25,7 @@ DEFAULT_CONFIG: dict[str, any] = {
 }
 
 
-def create_model(overrides: dict[str, any] | None = None) -> dict[str, any]:
+def create_model(overrides: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return a copy of :data:`DEFAULT_CONFIG` with *overrides* applied.
 
     Parameters

@@ -4,14 +4,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from matplotlib.axes import Axes
+
 
 def plot_edge_counts(
     edge_counts: np.ndarray,
     *,
     title: str = "Edges x Iteration",
-    ax: plt.Axes | None = None,
+    ax: Axes | None = None,
     show: bool = True,
-) -> plt.Axes:
+) -> Axes:
     """Plot edge-count evolution across simulation steps.
 
     Parameters
