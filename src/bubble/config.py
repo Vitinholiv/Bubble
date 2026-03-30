@@ -8,6 +8,7 @@ import numpy as np
 from bubble.affinity import cosine_similarity
 from bubble.metrics import cross_group_connectivity, modularity_change, assortativity_change
 from bubble.selection import select_by_max_degree
+from bubble.scaling import constant_scaling, linear_scaling, log_scaling, power_law_scaling, sqrt_scaling
 
 metric_options = {
     'cross_group_connectivity': cross_group_connectivity,
@@ -26,7 +27,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "gamma": 0.2,
     "affinity": cosine_similarity,
     "influencer_selection": select_by_max_degree,
-    "num_influencers": 4,
+    "influencer_scaling": constant_scaling(4),
     "bubble_burst_metric_name": 'cross_group_connectivity',
     "bubble_burst_metric": metric_options['cross_group_connectivity']
 }
