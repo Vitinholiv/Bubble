@@ -9,6 +9,12 @@ from bubble.affinity import cosine_similarity
 from bubble.metrics import cross_group_connectivity, modularity_change, assortativity_change
 from bubble.selection import select_by_max_degree
 
+metric_options = {
+    'cross_group_connectivity': cross_group_connectivity,
+    'modularity_change': modularity_change,
+    'assortativity_change': assortativity_change
+}
+
 DEFAULT_CONFIG: dict[str, Any] = {
     "num_nodes": 20,
     "words_per_node": (4, 4),
@@ -21,7 +27,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "affinity": cosine_similarity,
     "influencer_selection": select_by_max_degree,
     "num_influencers": 4,
-    "bubble_burst_metric": cross_group_connectivity,
+    "bubble_burst_metric_name": 'cross_group_connectivity',
+    "bubble_burst_metric": metric_options['cross_group_connectivity']
 }
 
 
@@ -42,4 +49,10 @@ def create_model(overrides: dict[str, Any] | None = None) -> dict[str, Any]:
     config = copy.deepcopy(DEFAULT_CONFIG)
     if overrides:
         config.update(overrides)
+        if 'bubble_burst_metric_name' in overrides:
+            new_name = overrides['bubble_burst_metric_name']
+            config['bubble_burst_metric'] = metric_options.get(
+                new_name, 
+                config['bubble_burst_metric']
+            )
     return config

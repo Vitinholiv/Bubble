@@ -50,7 +50,7 @@ def modularity_change(
     words_per_node: tuple[int, int],
     initial_metric_value: float
 ) -> float:
-    """Change in assortativity relative to the initial stage.
+    """Change in modularity relative to the initial stage.
 
     This serves as a proxy for "bubble burst": higher values indicate
     more interaction across group boundaries.
@@ -58,7 +58,7 @@ def modularity_change(
     Returns
     -------
     float
-        Difference between the initial Modularity and the current modularity.
+        Difference between the initial modularity and the current modularity.
     """
 
     # Safeguard to avoid division by zero
@@ -66,13 +66,16 @@ def modularity_change(
         return 0.0
 
     # Get the current modularity
-    current_modularity = modularity(G, [[R for R, attrs in G.nodes(data=True) if attrs.get("label") == 0],
-                                       [L for L, attrs in G.nodes(data=True) if attrs.get("label") == 1]])
+    communities = [[], []]
+    for n, d in G.nodes(data=True):
+        communities[d.get('label')].append(n)
+
+    current_modularity = modularity(G, communities)
 
     # Calculate the change in modularity
-    modularity_change =  initial_metric_value - current_modularity
+    modularity_change_value =  initial_metric_value - current_modularity
 
-    return modularity_change
+    return modularity_change_value
 
 def assortativity_change(
     G: nx.Graph,

@@ -30,6 +30,7 @@ class BubbleModel:
         - ``influencer_selection`` (callable): ``(G, n) -> list[int]``.
         - ``num_influencers`` (int): Number of influencers per iteration.
         - ``bubble_burst_metric`` (callable): ``(G, (u,v)) -> int``.
+        - ``bubble_burst_metric_name`` (string): ``Name of the bubble burst metric``.
     """
 
     # ------------------------------------------------------------------ #
@@ -43,6 +44,7 @@ class BubbleModel:
         self.affinity_level: float = hp["affinity_level"]
         self.edge_count = np.zeros((1, 4), dtype=int)
         self.burst_metric_values = np.zeros((1), dtype=float)
+        self.burst_metric_name = hp["bubble_burst_metric_name"]
 
         # --- Labels ---------------------------------------------
         if len(hp["labels"]) == self.num_nodes:
@@ -96,7 +98,7 @@ class BubbleModel:
         # --- Strategy callables ---------------------------------------
         self.affinity: Callable = hp["affinity"]
         self.influencer_selection: Callable = hp["influencer_selection"]
-        self.bubble_burst_metric = Callable = hp['bubble_burst_metric']
+        self.bubble_burst_metric: Callable = hp['bubble_burst_metric']
         self.num_influencers: int = hp["num_influencers"]
 
         # --- Initial edges --------------------------------------------
@@ -198,16 +200,30 @@ class BubbleModel:
         self.burst_metric_values = np.zeros(n+1, dtype=float)
         self.burst_metric_values[0] = temp_burst
 
+
+        # Store the initial metric as the baseline for change calculation
+        if self.burst_metric_name == 'modularity_change':
+            self.initial_metric = modularity(self.G, [[R for R, attrs in self.G.nodes(data=True) if attrs.get("label") == 0],
+                                [L for L, attrs in self.G.nodes(data=True) if attrs.get("label") == 1]])
+        elif self.burst_metric_name == 'assortativity_change':
+            try:
+                if self.G.number_of_edges() > 0:
+                    self.initial_metric = nx.attribute_assortativity_coefficient(self.G, "label")
+                else:
+                    self.initial_metric = 0.0
+            except (ZeroDivisionError, ValueError):
+                self.initial_metric = 0.0
+        elif self.burst_metric_name == 'cross_group_connectivity':
+            self.initial_metric = 0.0
+
+        self.burst_metric_values[0] = self.bubble_burst_metric(self.G, self.words_per_node, self.initial_metric)
+
         for i in range(n):
-            # Store the initial modularity as the baseline for change calculation
-            if i == 0:
-                self.initial_modularity = modularity(self.G, [[R for R, attrs in self.G.nodes(data=True) if attrs.get("label") == 0],
-                                        [L for L, attrs in self.G.nodes(data=True) if attrs.get("label") == 1]])
-            
             self.stage = i + 1
             self.edge_count[self.stage] = self.edge_count[i].copy()
             self.iteration(msg0, msg1)
-            self.burst_metric_values[self.stage] = self.bubble_burst_metric(self.G, self.words_per_node, self.initial_modularity)
+            self.burst_metric_values[self.stage] = self.bubble_burst_metric(self.G, self.words_per_node, self.initial_metric)
+
         return self.G
 
     # ------------------------------------------------------------------ #
