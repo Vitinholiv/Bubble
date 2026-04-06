@@ -204,8 +204,13 @@ class BubbleModel:
 
         # Store the initial metric as the baseline for change calculation
         if self.burst_metric_name == 'modularity_change':
-            self.initial_metric = modularity(self.G, [[R for R, attrs in self.G.nodes(data=True) if attrs.get("label") == 0],
-                                [L for L, attrs in self.G.nodes(data=True) if attrs.get("label") == 1]])
+            if self.G.number_of_edges() > 0:
+                self.initial_metric = modularity(self.G, [
+                    [R for R, attrs in self.G.nodes(data=True) if attrs.get("label") == 0],
+                    [L for L, attrs in self.G.nodes(data=True) if attrs.get("label") == 1]
+                ])
+            else:
+                self.initial_metric = 0.0
         elif self.burst_metric_name == 'assortativity_change':
             try:
                 if self.G.number_of_edges() > 0:
