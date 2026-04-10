@@ -66,7 +66,7 @@ def test_select_by_max_degree():
 def test_cross_group_connectivity_range():
     np.random.seed(0)
     model = BubbleModel(DEFAULT_CONFIG)
-    cg = cross_group_connectivity(model.G, model.words_per_node)
+    cg = cross_group_connectivity(model.G, model.words_per_node, 1.0)
     assert 0.0 <= cg <= 1.0
 
 

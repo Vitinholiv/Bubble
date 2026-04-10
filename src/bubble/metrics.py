@@ -68,7 +68,7 @@ def modularity_change(
     # Get the current modularity
     communities = [[], []]
     for n, d in G.nodes(data=True):
-        communities[d.get('label')].append(n)
+        communities[int(d.get('label'))].append(n)
 
     current_modularity = modularity(G, communities)
 
