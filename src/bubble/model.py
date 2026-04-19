@@ -45,6 +45,7 @@ class BubbleModel:
         self.edge_count = np.zeros((1, 4), dtype=int)
         self.burst_metric_values = np.zeros((1), dtype=float)
         self.burst_metric_name = hp["bubble_burst_metric_name"]
+        self.cross_edge_time = -1
 
         # --- Labels ---------------------------------------------
         if len(hp["labels"]) == self.num_nodes:
@@ -122,6 +123,8 @@ class BubbleModel:
             target = self.edge_count[self.stage]
             # Maps (label1,label2) to column index of edge_count: (0,0)->0, (0,1)->1, (1,0)->2, (1,1)->3
             target[self.labels[node1] + 2 * self.labels[node2]] += 1
+            if self.cross_edge_time == -1 and self.labels[node1] != self.labels[node2]:
+                self.cross_edge_time = self.stage
 
         elif aff < self.affinity_level and self.G.has_edge(node1, node2):
             self.G.remove_edge(node1, node2)
@@ -201,34 +204,13 @@ class BubbleModel:
         self.burst_metric_values = np.zeros(n+1, dtype=float)
         self.burst_metric_values[0] = temp_burst
 
-
-        # Store the initial metric as the baseline for change calculation
-        if self.burst_metric_name == 'modularity_change':
-            if self.G.number_of_edges() > 0:
-                self.initial_metric = modularity(self.G, [
-                    [R for R, attrs in self.G.nodes(data=True) if attrs.get("label") == 0],
-                    [L for L, attrs in self.G.nodes(data=True) if attrs.get("label") == 1]
-                ])
-            else:
-                self.initial_metric = 0.0
-        elif self.burst_metric_name == 'assortativity_change':
-            try:
-                if self.G.number_of_edges() > 0:
-                    self.initial_metric = nx.attribute_assortativity_coefficient(self.G, "label")
-                else:
-                    self.initial_metric = 0.0
-            except (ZeroDivisionError, ValueError):
-                self.initial_metric = 0.0
-        elif self.burst_metric_name == 'cross_group_connectivity':
-            self.initial_metric = 0.0
-
-        self.burst_metric_values[0] = self.bubble_burst_metric(self.G, self.words_per_node, self.initial_metric)
+        self.burst_metric_values[0] = self.bubble_burst_metric(self.G, self.words_per_node)
 
         for i in range(n):
             self.stage = i + 1
             self.edge_count[self.stage] = self.edge_count[i].copy()
             self.iteration(msg0, msg1)
-            self.burst_metric_values[self.stage] = self.bubble_burst_metric(self.G, self.words_per_node, self.initial_metric)
+            self.burst_metric_values[self.stage] = self.bubble_burst_metric(self.G, self.words_per_node)
 
         return self.G
 
