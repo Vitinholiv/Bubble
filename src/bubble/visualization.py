@@ -63,19 +63,28 @@ def plot_bubble_burst(
     title: str = "Bubble Burst x Iteration",
     ax: Axes | None = None,
     show: bool = True,
+    label: str | None = None,
+    color: str | None = None
 ) -> Axes:
     """Plot bubble burst metric progression across simulation steps.
 
     Parameters
     ----------
     burst_values : np.ndarray
-        Array of shape ``(n_steps+1)`` where each entry represents the value of the burst metric at a given iteration.
+        Array of shape ``(n_steps+1)`` where each entry represents the value 
+        of the burst metric at a given iteration.
+    burst_metric_name : str, optional
+        Name of the metric used, used for the label if 'label' is None.
     title : str, optional
         Plot title.
     ax : matplotlib.axes.Axes, optional
         Axes to draw on; a new figure is created when *None*.
     show : bool, optional
         Whether to call ``plt.show()`` at the end.
+    label : str, optional
+        Label for the plot line. Defaults to burst_metric_name.
+    color : str, optional
+        Color for the plot line. Defaults to "royalblue".
 
     Returns
     -------
@@ -84,13 +93,18 @@ def plot_bubble_burst(
     if ax is None:
         _, ax = plt.subplots(figsize=(10, 5))
 
+    plot_label = label if label is not None else burst_metric_name
+    plot_color = color if color is not None else "royalblue"
+
     steps = np.arange(len(burst_values))
-    ax.plot(steps, burst_values, label=f"{burst_metric_name}", color="royalblue")
+    ax.plot(steps, burst_values, label=plot_label, color=plot_color)
 
     ax.set_title(title)
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Metric Value")
-    ax.legend()
+    
+    if plot_label:
+        ax.legend()
 
     if show:
         plt.show()

@@ -1,5 +1,5 @@
 """Metrics for measuring filter-bubble phenomena."""
-
+import warnings
 import networkx as nx
 import math
 from networkx.algorithms.community import modularity
@@ -13,14 +13,11 @@ from networkx.algorithms.community import modularity
 
     words_per_node : tuple[int, int]
         Number of words for label-0 and label-1 respectively.
-
-    initial_modularity : float
-        The modularity of the graph at stage 0, used as a baseline for calculating change in modularity."""
+"""
 
 def cross_group_connectivity(
     G: nx.Graph,
-    words_per_node: tuple[int, int],
-    initial_metric_value: float
+    words_per_node: tuple[int, int]
 ) -> float:
     """Fraction of realized cross-group edges relative to the maximum possible.
 
@@ -45,63 +42,55 @@ def cross_group_connectivity(
 
     return float(cross_edges) / total_possible
 
-def modularity_change(
+def modularity_value(
     G: nx.Graph,
-    words_per_node: tuple[int, int],
-    initial_metric_value: float
+    words_per_node: tuple[int, int]
 ) -> float:
-    """Change in modularity relative to the initial stage.
+    """Calculates the modularity of the graph based on the group labels.
 
-    This serves as a proxy for "bubble burst": higher values indicate
-    more interaction across group boundaries.
+    This serves as a measure of structural segregation: higher values indicate 
+    that the groups are isolated and internally dense, while lower values
+    indicate a well-mixed network.
 
     Returns
     -------
     float
-        Difference between the initial modularity and the current modularity.
+        Modularity value.
     """
 
     # Safeguard to avoid division by zero
     if G.number_of_edges() == 0:
         return 0.0
 
-    # Get the current modularity
     communities = [[], []]
     for n, d in G.nodes(data=True):
         communities[int(d.get('label'))].append(n)
 
     current_modularity = modularity(G, communities)
 
-    # Calculate the change in modularity
-    modularity_change_value =  initial_metric_value - current_modularity
+    return current_modularity
 
-    return modularity_change_value
-
-def assortativity_change(
+def assortativity_value(
     G: nx.Graph,
-    words_per_node: tuple[int, int],
-    initial_metric_value: float = 1.0
+    words_per_node: tuple[int, int]
 ) -> float:
-    """Change in assortativity relative to the initial stage.
+    """Calculates the attribute assortativity coefficient for the labels.
 
     This serves as a proxy for "bubble burst": higher values indicate
-    more interaction across group boundaries.
+    more interaction between members of the same group, where lower values
+    indicate cross-group relations.
 
     Returns
     -------
     float
-        Difference between the initial assortativity 
-        and the current assortativity.
+        Assortativity value.
     """
 
-    # Get the current assortativity
-    current_assortativity = nx.attribute_assortativity_coefficient(G, "label")
-
-    # Safeguard for nan values
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        current_assortativity = nx.attribute_assortativity_coefficient(G, "label")
+    
     if math.isnan(current_assortativity):
-        current_assortativity = 1.0
-
-    # Calculate the change in assortativity
-    assortativity_change_value = initial_metric_value - current_assortativity
-
-    return assortativity_change_value
+        return 1.0
+    
+    return current_assortativity

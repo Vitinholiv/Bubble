@@ -6,14 +6,14 @@ from typing import Any
 import numpy as np
 
 from bubble.affinity import cosine_similarity
-from bubble.metrics import cross_group_connectivity, modularity_change, assortativity_change
+from bubble.metrics import cross_group_connectivity, modularity_value, assortativity_value
 from bubble.selection import select_by_max_degree
 from bubble.scaling import constant_scaling, linear_scaling, log_scaling, power_law_scaling, sqrt_scaling
 
 metric_options = {
     'cross_group_connectivity': cross_group_connectivity,
-    'modularity_change': modularity_change,
-    'assortativity_change': assortativity_change
+    'modularity_value': modularity_value,
+    'assortativity_value': assortativity_value
 }
 
 DEFAULT_CONFIG: dict[str, Any] = {
